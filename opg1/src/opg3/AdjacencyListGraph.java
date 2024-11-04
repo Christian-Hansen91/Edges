@@ -1,21 +1,24 @@
-import java.util.ArrayList;
-import java.util.List;
+package opg3;
+
+import java.util.*;
 
 /**
- * Edge list implementation of the graph interface.
+ * Adjacency list implementation of the graph interface.
  */
-public class EdgeListGraph<V> implements Graph<V> {
+public class AdjacencyListGraph<V> implements Graph<V> {
     // List with all the vertices in the graph.
     private List<V> vertices;
-    // List with all the edges in the graph.
-    private List<Edge<V>> edges;
+    // Map with pairs containing (vertex, list of edges),
+    // where list of edges is the incident edges to the vertex.
+    // Note: Each edge is in 2 lists of incident edges.
+    private Map<V, List<Edge<V>>> edges;
 
     //-----------------------------------------------------
 
-    /** Construct an empty EdgeListGraph. */
-    public EdgeListGraph() {
+    /** Construct an empty AdjacencyListGraph. */
+    public AdjacencyListGraph() {
         vertices = new ArrayList<>();
-        edges = new ArrayList<>();
+        edges = new LinkedHashMap<>();
     }
 
     /** Return a list with the vertices in the graph. */
@@ -27,7 +30,14 @@ public class EdgeListGraph<V> implements Graph<V> {
     /** Return a list with the edges in the graph. */
     @Override
     public List<Edge<V>> edges() {
-        return new ArrayList<>(edges);
+        Set<Edge<V>> edgeSet = new HashSet<>();
+        for (List<Edge<V>> valueList : edges.values()) {
+            for (Edge<V> edge : valueList) {
+                edgeSet.add(edge);
+            }
+        }
+
+        return new ArrayList<>(edgeSet);
     }
 
     /**
@@ -38,14 +48,13 @@ public class EdgeListGraph<V> implements Graph<V> {
     public List<V> neighbors(V v) {
         assert vertices.contains(v);
         List<V> neighbors = new ArrayList<>();
-        for (Edge<V> edge : edges) {
-            if (edge.getU().equals(v)) {
-                neighbors.add(edge.getV());
-            } else if (edge.getV().equals(v)) {
-                neighbors.add(edge.getU());
-            }
+        for (Edge<V> edge : incidentEdges(v)) {
+            if (edge.getV().equals(v)) neighbors.add(edge.getU());
+            else neighbors.add(edge.getU());
         }
+
         return neighbors;
+
     }
 
     /**
@@ -54,14 +63,7 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public int degree(V v) {
-        assert vertices.contains(v);
-        int degree = 0;
-        for (Edge<V> edge : edges) {
-            if (edge.getU().equals(v) || edge.getV().equals(v)) {
-                degree++;
-            }
-        }
-        return degree;
+        return incidentEdges(v).size();
     }
 
     /**
@@ -70,14 +72,11 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public List<Edge<V>> incidentEdges(V v) {
-        assert vertices.contains(v);
-        List<Edge<V>> incidentEdges = new ArrayList<>();
-        for (Edge<V> edge : edges) {
-            if (edge.getU().equals(v) || edge.getV().equals(v)) {
-                incidentEdges.add(edge);
-            }
+        List<Edge<V>> edges = new ArrayList<>();
+        for (Edge<V> edge : this.edges.get(v)) {
+            edges.add(edge);
         }
-        return incidentEdges;
+        return edges;
     }
 
     /**
@@ -86,29 +85,27 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public boolean areAdjacent(V u, V v) {
-        assert vertices.contains(u) && vertices.contains(v);
-        Edge<V> temp = new Edge<>(u, v);
-        for (Edge<V> edge : edges) {
-            if (edge.equals(temp)) return true;
-        }
+
         return false;
     }
+
 
     /** Print the vertices and the edges. */
     @Override
     public void printGraph() {
-        System.out.println("Vertices: " + vertices);
-        System.out.println("Edges: " + edges);
+        for (V v : vertices) {
+            List<Edge<V>> incidentEdges = edges.get(v);
+            System.out.print("Vertex: " + v);
+            System.out.println("\tIncident edges: " + incidentEdges);
+        }
     }
 
     /**
      * Add a vertex to the graph.
-     * Pre: The vertex is not in the graph before this addition.
-     */
+     * Pre: The vertex is not in the graph before this addition.     */
     @Override
     public void addVertex(V v) {
-        assert !vertices.contains(v);
-        vertices.add(v);
+        // TODO
     }
 
     /**
@@ -118,11 +115,8 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public Edge<V> addEdge(V u, V v, int weight) {
-        Edge<V> edge = new Edge<>(u, v, weight);
-        assert !edges.contains(edge);
-        assert weight >= 0;
-        edges.add(edge);
-        return edge;
+        // TODO
+        return null;
     }
 
     /**
@@ -131,8 +125,10 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public Edge<V> addEdge(V u, V v) {
-        return addEdge(u, v, 0);
+        // TODO
+        return null;
     }
+
 
     /**
      * Remove the specified vertex from the graph.
@@ -140,9 +136,7 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public void removeVertex(V v) {
-        assert vertices.contains(v);
-        assert incidentEdges(v).isEmpty();
-        vertices.remove(v);
+        // TODO
     }
 
     /**
@@ -152,8 +146,6 @@ public class EdgeListGraph<V> implements Graph<V> {
      */
     @Override
     public void removeEdge(V u, V v) {
-        assert vertices.contains(u);
-        assert vertices.contains(v);
-        edges.remove(new Edge<>(u, v));
+        // TODO
     }
 }
