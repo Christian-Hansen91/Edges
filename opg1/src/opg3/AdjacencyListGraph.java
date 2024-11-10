@@ -15,19 +15,25 @@ public class AdjacencyListGraph<V> implements Graph<V> {
 
     //-----------------------------------------------------
 
-    /** Construct an empty AdjacencyListGraph. */
+    /**
+     * Construct an empty AdjacencyListGraph.
+     */
     public AdjacencyListGraph() {
         vertices = new ArrayList<>();
         edges = new LinkedHashMap<>();
     }
 
-    /** Return a list with the vertices in the graph. */
+    /**
+     * Return a list with the vertices in the graph.
+     */
     @Override
     public List<V> vertices() {
         return new ArrayList<>(vertices);
     }
 
-    /** Return a list with the edges in the graph. */
+    /**
+     * Return a list with the edges in the graph.
+     */
     @Override
     public List<Edge<V>> edges() {
         Set<Edge<V>> edgeSet = new HashSet<>();
@@ -74,7 +80,7 @@ public class AdjacencyListGraph<V> implements Graph<V> {
     public List<Edge<V>> incidentEdges(V v) {
         List<Edge<V>> edges = new ArrayList<>();
         for (Edge<V> edge : this.edges.get(v)) {
-            edges.add(edge);
+            if (edge.getV().equals(v) || edge.getU().equals(v)) edges.add(edge);
         }
         return edges;
     }
@@ -85,12 +91,18 @@ public class AdjacencyListGraph<V> implements Graph<V> {
      */
     @Override
     public boolean areAdjacent(V u, V v) {
+        boolean adjacent = false;
+        for (Edge<V> edge : incidentEdges(u)) {
+            if (edge.getU().equals(v) || edge.getV().equals(v)) adjacent = true;
+        }
 
-        return false;
+        return adjacent;
     }
 
 
-    /** Print the vertices and the edges. */
+    /**
+     * Print the vertices and the edges.
+     */
     @Override
     public void printGraph() {
         for (V v : vertices) {
@@ -102,10 +114,12 @@ public class AdjacencyListGraph<V> implements Graph<V> {
 
     /**
      * Add a vertex to the graph.
-     * Pre: The vertex is not in the graph before this addition.     */
+     * Pre: The vertex is not in the graph before this addition.
+     */
     @Override
     public void addVertex(V v) {
-        // TODO
+        assert !vertices.contains(v);
+        vertices.add(v);
     }
 
     /**
@@ -115,8 +129,15 @@ public class AdjacencyListGraph<V> implements Graph<V> {
      */
     @Override
     public Edge<V> addEdge(V u, V v, int weight) {
-        // TODO
-        return null;
+        assert weight >= 0;
+        assert vertices.contains(u) && vertices.contains(v);
+        Edge<V> edge = new Edge<>(u, v, weight);
+        assert !edges.containsValue(edge);
+        if (edges.get(v) == null) edges.put(v, new ArrayList<>());
+        if (edges.get(u) == null) edges.put(u, new ArrayList<>());
+        edges.get(v).add(edge);
+        edges.get(u).add(edge);
+        return edge;
     }
 
     /**
@@ -125,10 +146,8 @@ public class AdjacencyListGraph<V> implements Graph<V> {
      */
     @Override
     public Edge<V> addEdge(V u, V v) {
-        // TODO
-        return null;
+        return addEdge(v, u, 0);
     }
-
 
     /**
      * Remove the specified vertex from the graph.
@@ -136,16 +155,22 @@ public class AdjacencyListGraph<V> implements Graph<V> {
      */
     @Override
     public void removeVertex(V v) {
-        // TODO
+        assert vertices.contains(v);
+        assert incidentEdges(v).isEmpty();
+        vertices.remove(v);
     }
 
     /**
      * Remove the edge between the specified vertices from the graph.
      * Pre: The vertices are vertices in the graph,
-     *   and The graph has an edge between the vertices.
+     * and The graph has an edge between the vertices.
      */
     @Override
     public void removeEdge(V u, V v) {
-        // TODO
+        assert vertices.contains(v) && vertices.contains(u);
+        assert areAdjacent(v, u);
+        Edge<V> edge = new Edge<>(u, v);
+        edges.get(v).remove(edge);
+        edges.get(u).remove(edge);
     }
 }
